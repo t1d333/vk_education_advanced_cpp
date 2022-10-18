@@ -1,10 +1,11 @@
 #pragma once
-#include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstddef>
+#include <istream>
 #include <stdexcept>
-#include <cassert>
-#include <array>
+
+
 
 template<size_t rows, size_t cols>
 class Matrix {
@@ -15,15 +16,23 @@ class Matrix {
 		Matrix(double* buf);
 	public:
 		static constexpr double Epsilon = 1e-7;
+		
+
+		//Constructors
 		Matrix(): buffer(new double[rows* cols]) {}
 
 		Matrix(const Matrix<rows, cols> &other);
+  		explicit Matrix(std::istream &is);
+		
 
 		template<size_t rows_other, size_t cols_other, size_t count>
 		Matrix(const std::array<Matrix<rows_other, cols_other>, count> &arr);
 
 		template<size_t count>
 		Matrix(const std::array<double, count> &arr);
+
+
+		//Operators
 
 		Matrix<rows, cols>& operator=(const Matrix<rows, cols> &rhs);
 
@@ -33,10 +42,7 @@ class Matrix {
 		template<size_t rows_other, size_t cols_other>
 		bool operator==(const Matrix<rows_other, cols_other> &other);
 
-		size_t get_rows_count() const;
-		size_t get_cols_count() const;
-
-		template<size_t rows_rhs, size_t cols_rhs>
+			template<size_t rows_rhs, size_t cols_rhs>
 		Matrix<rows, cols> operator+(const Matrix<rows_rhs, cols_rhs> &rhs) const;
 
 		template<size_t rows_rhs, size_t cols_rhs>
@@ -54,20 +60,26 @@ class Matrix {
 		template<size_t rows_rhs, size_t cols_rhs>
 		Matrix<rows, cols_rhs>& operator*=(const Matrix<rows_rhs, cols_rhs> &rhs);
 		
-		//Поэлементное умножение
-		template<size_t rows_other, size_t cols_other>
-		Matrix<rows, cols> mul_elem(const Matrix<rows_other, cols_other> &other);
-
+		// Getters
+		size_t get_rows_count() const;
+		size_t get_cols_count() const;
 		Matrix<1, cols> get_row(size_t n) const;
 		Matrix<rows, 1> get_col(size_t n) const;
 		Matrix<rows, cols> get_diag() const;
 
+
+
+		// Multiplication
+		template<size_t rows_other, size_t cols_other>
+		Matrix<rows, cols> mul_elem(const Matrix<rows_other, cols_other> &other);
+
+		// Matrix operations
  		Matrix<cols, rows> transp() const;
  		Matrix<rows, cols> adj() const;
   		Matrix<rows, cols> inv() const;
-
 		double det() const;
 
+		// Destructor
 		~Matrix() {delete[] buffer;}
 };
 
@@ -79,9 +91,26 @@ Matrix<rows, cols>::Matrix(double* buffer) {
 }
 
 template<size_t rows, size_t cols>
+Matrix<rows, cols>::Matrix(std::istream& is) {
+    bool flag = !is.bad();
+    buffer = flag ? new double[rows * cols] : nullptr;
+	for (size_t i = 0; (i < rows * cols) && flag; i++) {
+		if (!(is >> buffer[i])) {
+			flag = false;
+        }
+	}
+	if (!flag) {
+		delete[] buffer;
+        throw std::runtime_error("Failde to create matrix from input stream");
+	}
+
+}
+template<size_t rows, size_t cols>
 Matrix<rows, cols>::Matrix(const Matrix<rows, cols> &other) : buffer(new double[rows * cols]) {
 	std::copy(other.buffer, other.buffer + cols * rows, buffer);
 }
+
+
 template<size_t rows, size_t cols>
 Matrix<rows, cols>& Matrix<rows, cols>::operator=(const Matrix<rows, cols> &rhs) {
 	if (this != &rhs) {
@@ -89,6 +118,8 @@ Matrix<rows, cols>& Matrix<rows, cols>::operator=(const Matrix<rows, cols> &rhs)
 	}
 	return *this;
 }
+
+
 template<size_t rows, size_t cols>
 template<size_t count>
 Matrix<rows, cols>::Matrix(const std::array<double, count> &arr) {
@@ -98,6 +129,8 @@ Matrix<rows, cols>::Matrix(const std::array<double, count> &arr) {
 	buffer = new double[rows * cols];
 	std::copy(arr.begin(), arr.end(), buffer);
 }
+
+
 template<size_t rows, size_t cols>
 template<size_t rows_other, size_t cols_other>
 bool Matrix<rows, cols>::operator==(const Matrix<rows_other, cols_other> &other) {
@@ -144,21 +177,24 @@ double& Matrix<rows, cols>::operator()(size_t i, size_t j) {
 	return buffer[i * cols + j];
 }
 
+
 template <size_t rows, size_t cols>
 double Matrix<rows, cols>::operator()(size_t i, size_t j) const{
 	return buffer[i * cols + j];
 }
 
 
-
 template<size_t rows, size_t cols>
 size_t Matrix<rows, cols>::get_rows_count() const {
 	return rows;
 }
+
+
 template<size_t rows, size_t cols>
 size_t Matrix<rows, cols>::get_cols_count() const {
 	return cols;
 }
+
 
 template<size_t rows, size_t cols>
 Matrix<rows, cols> operator*(double val, const Matrix<rows, cols>& matrix) {
@@ -170,10 +206,13 @@ Matrix<rows, cols> operator*(double val, const Matrix<rows, cols>& matrix) {
 	}
 	return result;
 }
+
+
 template<size_t rows, size_t cols>
 Matrix<rows, cols> operator*(const Matrix<rows, cols>& matrix, double val) {
 	return val * matrix;
 }
+
 
 template<size_t rows, size_t cols>
 template<size_t rows_rhs, size_t cols_rhs>
@@ -216,6 +255,7 @@ Matrix<rows, cols> Matrix<rows, cols>::operator-(const Matrix<rows_rhs, cols_rhs
 	return rhs + (-1) * rhs; 
 }
 
+
 template<size_t rows, size_t cols>
 Matrix<1, cols> Matrix<rows, cols>::get_row(size_t n) const {
 	Matrix<1, cols>	result;
@@ -224,6 +264,7 @@ Matrix<1, cols> Matrix<rows, cols>::get_row(size_t n) const {
 	}
 	return result;
 }
+
 
 template<size_t rows, size_t cols>
 Matrix<rows, 1> Matrix<rows, cols>::get_col(size_t n) const {
@@ -234,9 +275,12 @@ Matrix<rows, 1> Matrix<rows, cols>::get_col(size_t n) const {
 	return result;
 }
 
+
 template<size_t rows, size_t cols>
 Matrix<rows, cols> Matrix<rows, cols>::get_diag() const {
-	assert(rows == cols);
+	if (rows != cols) {
+		throw std::runtime_error("Invalid matrix");
+	}
 	Matrix<rows, cols>result;
 	for (size_t i = 0; i < rows; i++) {
 		for (size_t j = 0; j < cols; j++) {
@@ -266,6 +310,7 @@ Matrix<rows, cols_rhs> Matrix<rows, cols>::operator*(const Matrix<rows_rhs, cols
 	return result;
 }
 
+
 template<size_t rows, size_t cols>
 template<size_t rows_rhs, size_t cols_rhs>
 Matrix<rows, cols>& Matrix<rows, cols>::operator+=(const Matrix<rows_rhs, cols_rhs> &rhs) {
@@ -287,6 +332,7 @@ Matrix<rows, cols>& Matrix<rows, cols>::operator-=(const Matrix<rows_rhs, cols_r
 	return *this;
 }
 
+
 template<size_t rows, size_t cols>
 template<size_t rows_rhs, size_t cols_rhs>
 Matrix<rows, cols_rhs>& Matrix<rows, cols>::operator*=(const Matrix<rows_rhs, cols_rhs> &rhs) {
@@ -296,6 +342,8 @@ Matrix<rows, cols_rhs>& Matrix<rows, cols>::operator*=(const Matrix<rows_rhs, co
 	*this = *this * rhs;
 	return *this;
 }
+
+
 template<size_t rows, size_t cols>
 Matrix<cols, rows> Matrix<rows, cols>::transp() const {
 	Matrix<cols, rows> result;
@@ -306,9 +354,10 @@ Matrix<cols, rows> Matrix<rows, cols>::transp() const {
 	}
 	return result;
 }
+
+
 template<size_t rows, size_t cols>
 double*  Matrix<rows, cols>::get_matrix_winthout_row_and_col(size_t row, size_t col) const {
-	assert((rows > 0) && (cols > 0));
 	size_t offsetX = 0;
 	size_t offsetY = 0;
 	double* result = new double[(rows - 1) * (cols - 1)];
@@ -327,9 +376,9 @@ double*  Matrix<rows, cols>::get_matrix_winthout_row_and_col(size_t row, size_t 
 	return result;
 }
 
+
 template<size_t rows, size_t cols>
 double Matrix<rows, cols>::get_minor(size_t row, size_t col) const {
-	assert((rows == cols) && (rows > 1));
 	double* tmp = get_matrix_winthout_row_and_col(row, col);
 	switch (rows - 1) {
 		case 1:
@@ -347,9 +396,12 @@ double Matrix<rows, cols>::get_minor(size_t row, size_t col) const {
 	}
 }
 
+
 template<size_t rows, size_t cols>
 double Matrix<rows, cols>::det() const {
-	assert(rows == cols);
+	if (rows != cols) {
+		throw std::runtime_error("Invalid matrix");
+	}
 	if (rows == 1) {
 		return (*this)(0, 0);
 	}
@@ -361,14 +413,20 @@ double Matrix<rows, cols>::det() const {
 	}
 	return det;
 }
+
+
 template<size_t rows, size_t cols>
 Matrix<rows, cols> Matrix<rows, cols>::inv() const {
 	double d = det();
-	assert(d != 0);
+	if (d == 0) {
+		throw std::runtime_error("Singulal matrix");
+	}
 	return adj() * (1 / d); 
 	
 	
 }
+
+
 template<size_t rows, size_t cols>
 Matrix<rows, cols> Matrix<rows, cols>::adj() const {
 	Matrix<rows, cols>	result;
