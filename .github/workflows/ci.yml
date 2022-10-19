@@ -13,3 +13,11 @@ jobs:
       steps:
         - uses: actions/checkout@v3
         - run: make build
+    test:
+      runs-on: ubuntu-latest
+      container: leshiy1295/gcc_linters_valgrind_cmake_gtest
+      needs: [build]
+      steps:
+        - uses: actions/checkout@v3
+        - run: make test 
+

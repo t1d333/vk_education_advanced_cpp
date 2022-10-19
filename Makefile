@@ -1,10 +1,9 @@
-.PHONY: all build check clean
+.PHONY: all build check clean rebuild
 
-all: check  build clean
+all: check  build clean rebuild
 
 clean:
-	rm -rf build
-
+	rm -rf build 
 check:
 	cpplint --extensions=cpp,hpp project/include/* project/src/* 
 	cppcheck project --enable=all --inconclusive --error-exitcode=1 -I project/include --suppress=missingIncludeSystem 
@@ -14,3 +13,8 @@ build:
 	cmake -S . -B build
 	cmake --build build/
 
+rebuild: clean build
+
+
+test:
+	ctest --test-dir build -V -R

@@ -56,7 +56,7 @@ Matrix<rows, cols>::Matrix(const std::array<double, count> &arr) {
 template<size_t rows, size_t cols>
 template<size_t rows_other, size_t cols_other>
 bool Matrix<rows, cols>::operator==(const Matrix<rows_other, cols_other> &other) {
-    bool flag = ((rows == rows_other) == (cols == cols_other));
+    bool flag = ((rows == rows_other) && (cols == cols_other));
     if (flag) {
         for (size_t i = 0; i < cols * rows; i++) {
             if (std::fabs(buffer[i] - other.buffer[i]) > Epsilon) {
