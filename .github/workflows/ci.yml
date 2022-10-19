@@ -1,5 +1,5 @@
 on: push
-  jobs:
+jobs:
     check:
       runs-on: ubuntu-latest
       container: leshiy1295/gcc_linters_valgrind_cmake_gtest
