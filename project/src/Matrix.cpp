@@ -1,4 +1,6 @@
-#pragma once
+
+#ifdef PROJECT_INCLUDE_MATRIX_HPP_
+
 #include <array>
 #include <cmath>
 #include <cstddef>
@@ -8,8 +10,6 @@
 #include <stdexcept>
 #include <limits>
 #include <iomanip>
-
-#include "../include/Matrix.hpp"
 
 template<size_t rows, size_t cols>
 Matrix<rows, cols>::Matrix(std::istream& is) {
@@ -365,3 +365,4 @@ Matrix<rows, cols> Matrix<rows, cols>::adj() const {
     }
     return result;
 }
+#endif
