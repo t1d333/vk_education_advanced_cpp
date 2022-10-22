@@ -16,5 +16,5 @@ build:
 rebuild: clean build
 
 
-test:
-	ctest --test-dir build -V -R
+test: rebuild
+	cd build && ctest -V -R
