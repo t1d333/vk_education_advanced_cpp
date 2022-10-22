@@ -1,44 +1,52 @@
-
 #ifdef PROJECT_INCLUDE_MATRIX_HPP_
-
 #include <array>
 #include <cmath>
 #include <cstddef>
 #include <ctime>
 #include <iostream>
 #include <istream>
+#include <iterator>
 #include <stdexcept>
 #include <limits>
 #include <iomanip>
 
 template<size_t rows, size_t cols>
-Matrix<rows, cols>::Matrix(std::istream& is) {
-    bool flag = !is.bad();
-    buffer = flag ? new double[rows * cols] : nullptr;
-    for (size_t i = 0; (i < rows * cols) && flag; i++) {
-        if (!(is >> buffer[i])) {
-            flag = false;
-        }
-    }
-    if (!flag) {
-        delete[] buffer;
-        throw std::runtime_error("Failde to create matrix from input stream");
-    }
+Matrix<rows, cols>::Matrix(const Matrix<rows, cols> &other) {
+    std::copy(other.buffer.begin(), other.buffer.end() , buffer.begin());
 }
-
-template<size_t rows, size_t cols>
-Matrix<rows, cols>::Matrix(const Matrix<rows, cols> &other)
-    : buffer(new double[rows * cols]) {
-    std::copy(other.buffer, other.buffer + cols * rows, buffer);
-}
-
 
 template<size_t rows, size_t cols>
 Matrix<rows, cols>& Matrix<rows, cols>::operator=(const Matrix<rows, cols> &rhs) {
     if (this != &rhs) {
-        std::copy(rhs.buffer, rhs.buffer + rows * cols, buffer);
+        std::copy(rhs.buffer.begin(), rhs.buffer.end(), buffer.begin());
     }
     return *this;
+}
+
+template<size_t rows, size_t cols>
+template<size_t cols_other, size_t count>
+Matrix<rows, cols>::Matrix(const std::array<Matrix_row<cols_other>, count> &arr) {
+    if ((cols_other != cols) || (count != rows)) {
+        throw std::runtime_error("Failed to create matrix");
+    }
+    for (size_t i = 0; i < rows; i++) {
+        for (size_t j = 0; j < cols; j++) {
+            buffer[i * cols + j] = arr[i](0, j);
+        }
+    }
+}
+
+template<size_t rows, size_t cols>
+template<size_t rows_other, size_t count>
+Matrix<rows, cols>::Matrix(const std::array<Matrix_col<rows_other>, count> &arr) {
+    if ((rows_other != rows) || (cols != count)) {
+        throw std::runtime_error("Failed to create matrix");
+    }
+    for (size_t i = 0; i < rows; i++) {
+        for (size_t j = 0; j < cols; j++) {
+            buffer[i * cols + j] = arr[j](i, 0);
+        }
+    }
 }
 
 
@@ -48,8 +56,7 @@ Matrix<rows, cols>::Matrix(const std::array<double, count> &arr) {
     if (count != rows * cols) {
         throw "Failed to create matrix from numbers";
     }
-    buffer = new double[rows * cols];
-    std::copy(arr.begin(), arr.end(), buffer);
+    std::copy(arr.begin(), arr.end(), buffer.begin());
 }
 
 
@@ -67,28 +74,6 @@ bool Matrix<rows, cols>::operator==(const Matrix<rows_other, cols_other> &other)
     return flag;
 }
 
-
-template<size_t rows, size_t cols>
-template<size_t rows_other, size_t cols_other, size_t count>
-Matrix<rows, cols>::Matrix(const std::array<Matrix<rows_other, cols_other>, count> &arr) {
-    if ((rows_other == 1) && (cols_other == cols) && (count == rows)) {
-        buffer = new double[rows * cols];
-        for (size_t i = 0; i < rows; i++) {
-            for (size_t j = 0; j < cols; j++) {
-                buffer[i * cols + j] = arr[i](0, j);
-            }
-        }
-    } else if ((rows_other == rows) && (cols_other == 1) && (count == cols)) {
-        buffer = new double[rows * cols];
-        for (size_t i = 0; i < rows; i++) {
-            for (size_t j = 0; j < cols; j++) {
-                buffer[i * cols + j] = arr[j](i, 0);
-            }
-        }
-    } else {
-        throw std::runtime_error("Failed to create matrix from vectors");
-    }
-}
 
 
 template<size_t rows, size_t cols>
@@ -165,8 +150,8 @@ Matrix<rows, cols> Matrix<rows, cols>::operator-(const Matrix<rows_rhs, cols_rhs
 
 
 template<size_t rows, size_t cols>
-Matrix<1, cols> Matrix<rows, cols>::get_row(size_t n) const {
-    Matrix<1, cols> result;
+Matrix_row<cols> Matrix<rows, cols>::get_row(size_t n) const {
+    Matrix_row<cols> result;
     for (size_t i = 0; i < cols; i++) {
         result(0, i) = buffer[n * cols + i];
     }
@@ -175,8 +160,8 @@ Matrix<1, cols> Matrix<rows, cols>::get_row(size_t n) const {
 
 
 template<size_t rows, size_t cols>
-Matrix<rows, 1> Matrix<rows, cols>::get_col(size_t n) const {
-    Matrix<rows, 1> result;
+Matrix_col<rows> Matrix<rows, cols>::get_col(size_t n) const {
+    Matrix_col<rows> result;
     for (size_t i = 0; i < rows; i++) {
         result(i, 0) = buffer[i * cols + n];
     }
@@ -185,15 +170,13 @@ Matrix<rows, 1> Matrix<rows, cols>::get_col(size_t n) const {
 
 
 template<size_t rows, size_t cols>
-Matrix<rows, cols> Matrix<rows, cols>::get_diag() const {
+Matrix_col<rows> Matrix<rows, cols>::get_diag() const {
     if (rows != cols) {
         throw std::runtime_error("Invalid matrix");
     }
-    Matrix<rows, cols>result;
+    Matrix_col<rows>result;
     for (size_t i = 0; i < rows; i++) {
-        for (size_t j = 0; j < cols; j++) {
-            result(i, j) = (i == j) ? (*this)(i, j) : 0;
-        }
+            result(i, 0) = (*this)(i, i);
     }
     return result;
 }
@@ -236,6 +219,7 @@ Matrix<rows, cols>& Matrix<rows, cols>::operator-=(const Matrix<rows_rhs, cols_r
     if ((rows_rhs != rows) || (cols_rhs != cols)) {
         throw std::runtime_error("Dimension mismatch");
     }
+
     *this = *this - rhs;
     return *this;
 }
@@ -263,7 +247,6 @@ Matrix<cols, rows> Matrix<rows, cols>::transp() const {
     return result;
 }
 
-
 template<size_t rows, size_t cols>
 double*  Matrix<rows, cols>::get_matrix_winthout_row_and_col(const double* buf, size_t rows_size,
     size_t cols_size, size_t row, size_t col) const {
@@ -284,6 +267,7 @@ double*  Matrix<rows, cols>::get_matrix_winthout_row_and_col(const double* buf, 
     return result;
 }
 
+
 template<size_t rows, size_t cols>
 std::ostream& operator<<(std::ostream &os, const Matrix<rows, cols> &matrix) {
     os << rows << " " << cols << std::endl;
@@ -296,8 +280,6 @@ std::ostream& operator<<(std::ostream &os, const Matrix<rows, cols> &matrix) {
     }
     return os;
 }
-
-
 template<size_t rows, size_t cols>
 double Matrix<rows, cols>::get_minor(const double *buf,  size_t rows_size,
         size_t cols_size, size_t row, size_t col) const {
@@ -306,12 +288,10 @@ double Matrix<rows, cols>::get_minor(const double *buf,  size_t rows_size,
     switch (rows_size - 1) {
         case 1:
             res = tmp[0];
-            delete[] tmp;
-            return res;
+            break;
         case 2:
             res = tmp[0] * tmp[3] - tmp[1] * tmp[2];
-            delete[] tmp;
-            return res;
+            break;
         default:
             double det = 0;
             double deg = 1;
@@ -319,9 +299,10 @@ double Matrix<rows, cols>::get_minor(const double *buf,  size_t rows_size,
                 det += deg * tmp[i] * get_minor(tmp, rows_size - 1, cols_size - 1, 0, i);
                 deg *= -1;
             }
-            delete [] tmp;
-            return det;
+            res = det;
     }
+    delete tmp;
+    return res;
 }
 
 
@@ -335,10 +316,13 @@ double Matrix<rows, cols>::det() const {
     }
     double det = 0;
     double deg = 1;
+    double* tmp = new double[rows * cols];
+    std::copy(buffer.begin(), buffer.end(), tmp);
     for (size_t i = 0; i < cols; i++) {
-        det += deg * (*this)(0, i) * get_minor(buffer, rows, cols, 0, i);
+        det += deg * (*this)(0, i) * get_minor(tmp, rows, cols, 0, i);
         deg *= -1;
     }
+    delete[] tmp;
     return det;
 }
 
@@ -357,12 +341,16 @@ template<size_t rows, size_t cols>
 Matrix<rows, cols> Matrix<rows, cols>::adj() const {
     Matrix<rows, cols>  result;
     double deg = 1;
+    double* tmp = new double[rows * cols];
+    std::copy(buffer.begin(), buffer.end(), tmp);
     for (size_t i = 0; i < rows; i++) {
         for (size_t j = 0; j < cols; j++) {
-            result(i, j) = deg * get_minor(buffer, rows, cols, j, i);
+            result(i, j) = deg * get_minor(tmp, rows, cols, j, i);
             deg *= -1;
         }
+        deg *= -1;
     }
+    delete[] tmp;
     return result;
 }
 #endif

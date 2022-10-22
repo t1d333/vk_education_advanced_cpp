@@ -1,7 +1,7 @@
 #include "../include/utils.hpp"
 #include <cstddef>
 
-MatrixData createMatrixData(std::istream& is, size_t rows, size_t cols) {
+MatrixData create_matrix_data(std::istream& is, size_t rows, size_t cols) {
 
   if (!is) {
     throw std::runtime_error("Failed to create matrix_data from input stream");
@@ -34,4 +34,3 @@ std::ostream& operator<<(std::ostream& os, const MatrixData& matrix_data) {
 
   return os;
 }
-

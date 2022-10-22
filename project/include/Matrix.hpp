@@ -5,10 +5,21 @@
 #include <iostream>
 #include <istream>
 
+
+template<size_t rows, size_t cols>
+class Matrix;
+
+template<size_t cols>
+using Matrix_row = Matrix<1, cols>;
+
+template<size_t rows>
+using Matrix_col = Matrix<rows, 1>;
+
 template<size_t rows, size_t cols>
 class Matrix {
  private:
-    double* buffer;
+    std::array<double, rows * cols> buffer;
+
     double* get_matrix_winthout_row_and_col(const double* buf, size_t rows_size,
     size_t cols_size, size_t row, size_t col) const;
     double get_minor(const double* buf, size_t rows_size, size_t cols_size, size_t row, size_t col) const;
@@ -17,17 +28,18 @@ class Matrix {
     static constexpr double Epsilon = 1e-7;
 
     // Constructors
-    Matrix(): buffer(new double[rows* cols]) {}
+    Matrix() = default;
 
     Matrix(const Matrix<rows, cols> &other);
-    explicit Matrix(std::istream &is);
 
-    template<size_t rows_other, size_t cols_other, size_t count>
-    explicit Matrix(const std::array<Matrix<rows_other, cols_other>, count> &arr);
+    template<size_t cols_other, size_t count>
+    explicit Matrix(const std::array<Matrix_row<cols_other>, count> &arr);
+
+    template<size_t rows_other, size_t count>
+    explicit Matrix(const std::array<Matrix_col<rows_other>, count> &arr);
 
     template<size_t count>
     explicit Matrix(const std::array<double, count> &arr);
-
     // Operators
 
     Matrix<rows, cols>& operator=(const Matrix<rows, cols> &rhs);
@@ -56,9 +68,10 @@ class Matrix {
     template<size_t rows_rhs, size_t cols_rhs>
     Matrix<rows, cols_rhs>& operator*=(const Matrix<rows_rhs, cols_rhs> &rhs);
     // Getters
-    Matrix<1, cols> get_row(size_t n) const;
-    Matrix<rows, 1> get_col(size_t n) const;
-    Matrix<rows, cols> get_diag() const;
+    Matrix_row<cols> get_row(size_t n) const;
+    Matrix_col<rows> get_col(size_t n) const;
+    Matrix_col<rows> get_diag() const;
+
 
     // Multiplication
     template<size_t rows_other, size_t cols_other>
@@ -71,8 +84,7 @@ class Matrix {
     double det() const;
 
     // Destructor
-    ~Matrix() {delete[] buffer;}
+    ~Matrix() = default;
 };
-
 #include "../src/Matrix.cpp"
 #endif  // PROJECT_INCLUDE_MATRIX_HPP_
