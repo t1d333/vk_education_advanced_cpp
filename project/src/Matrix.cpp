@@ -125,7 +125,7 @@ Matrix<rows, cols> Matrix<rows, cols>::operator+(const Matrix<rows_rhs, cols_rhs
 
 template<size_t rows, size_t cols>
 template<size_t rows_other, size_t cols_other>
-Matrix<rows, cols> Matrix<rows, cols>::mul_elem(const Matrix<rows_other, cols_other> &other) {
+Matrix<rows, cols> Matrix<rows, cols>::mul_elem(const Matrix<rows_other, cols_other> &other) const {
     if ((rows != rows_other) || (cols_other != cols)) {
         throw std::runtime_error("Dimension mismatch");
     }
@@ -145,15 +145,79 @@ Matrix<rows, cols> Matrix<rows, cols>::operator-(const Matrix<rows_rhs, cols_rhs
     if ((rows_rhs != rows) || (cols_rhs != cols)) {
         throw std::runtime_error("Dimension mismatch");
     }
-    return rhs + (-1) * rhs;
+    return *this + (-1) * rhs;
 }
 
+template<size_t rows, size_t cols>
+Matrix<rows, cols> Matrix<rows, cols>::operator+(double val) const {
+    Matrix<rows, cols> result;
+    for (size_t i = 0; i < rows; i++) {
+        for (size_t j = 0; j < cols; j++) {
+            result(i, j) = (*this)(i, j) + val;
+        }
+    }
+    return result;
+}
 
+template<size_t rows, size_t cols>
+Matrix<rows, cols> operator+(double val, const Matrix<rows, cols>& m) {
+    return m + val;
+}
+
+template<size_t rows, size_t cols>
+Matrix<rows, cols>& Matrix<rows, cols>::operator+=(double val) {
+    return (*this = *this + val);
+}
 template<size_t rows, size_t cols>
 Matrix_row<cols> Matrix<rows, cols>::get_row(size_t n) const {
     Matrix_row<cols> result;
     for (size_t i = 0; i < cols; i++) {
         result(0, i) = buffer[n * cols + i];
+    }
+    return result;
+}
+
+template<size_t rows, size_t cols>
+Matrix<rows, cols> Matrix<rows, cols>::operator-(double val) const {
+    return *this + (-1) * val;
+}
+
+template<size_t rows, size_t cols>
+Matrix<rows, cols> operator-(double val, const Matrix<rows, cols>& m) {
+    return (-1) * m + val;
+}
+
+template<size_t rows, size_t cols>
+Matrix<rows, cols>& Matrix<rows, cols>::operator-=(double val) {
+    return (*this = *this - val);
+}
+
+template<size_t rows, size_t cols>
+template<size_t dim>
+Matrix<rows, cols> Matrix<rows, cols>::sum_row(Matrix_row<dim> row) const {
+    if (dim != cols) {
+        throw std::runtime_error("Dimension mismatch");
+    }
+    Matrix<rows, cols> result;
+    for (size_t i = 0; i < rows; i++) {
+        for (size_t j = 0; j < cols; j++) {
+            result(i, j) = (*this)(i, j) + row(0, j);
+        }
+    }
+    return result;
+}
+
+template<size_t rows, size_t cols>
+template<size_t dim>
+Matrix<rows, cols> Matrix<rows, cols>::sum_col(Matrix_col<dim> col) const {
+    if (dim != rows) {
+        throw std::runtime_error("Dimension mismatch");
+    }
+    Matrix<rows, cols> result;
+    for (size_t i = 0; i < rows; i++) {
+        for (size_t j = 0; j < cols; j++) {
+            result(i, j) = (*this)(i, j) + col(i, 0);
+        }
     }
     return result;
 }
@@ -208,8 +272,7 @@ Matrix<rows, cols>& Matrix<rows, cols>::operator+=(const Matrix<rows_rhs, cols_r
     if ((rows_rhs != rows) || (cols_rhs != cols)) {
         throw std::runtime_error("Dimension mismatch");
     }
-    *this = *this + rhs;
-    return *this;
+    return *this = *this + rhs;
 }
 
 
@@ -220,8 +283,7 @@ Matrix<rows, cols>& Matrix<rows, cols>::operator-=(const Matrix<rows_rhs, cols_r
         throw std::runtime_error("Dimension mismatch");
     }
 
-    *this = *this - rhs;
-    return *this;
+    return *this = *this - rhs;
 }
 
 
@@ -231,8 +293,7 @@ Matrix<rows, cols_rhs>& Matrix<rows, cols>::operator*=(const Matrix<rows_rhs, co
     if ((rows_rhs != rows) || (cols_rhs != cols)) {
         throw std::runtime_error("Dimension mismatch");
     }
-    *this = *this * rhs;
-    return *this;
+    return *this = *this * rhs;
 }
 
 

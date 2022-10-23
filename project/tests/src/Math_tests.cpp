@@ -91,3 +91,137 @@ TEST(MathOperation, Inv) {
     is.close();
     ASSERT_EQ(m.inv(), expected_matrix);
 }
+
+TEST(MathOperation, SumMatrix) {
+    fs::path data_path{glob_test_dir / "sum" };
+    std::ifstream is(data_path / "in1.txt");  
+    Matrix<6, 9> lhs = create_matrix_from_file<6, 9>(is);
+    Matrix<6, 9> rhs = create_matrix_from_file<6, 9>(is);
+    is.close();
+    is.open(data_path/"out1.txt");
+    MatrixData expected_matrix = create_matrix_data(is, 6, 9);
+    is.close();
+    ASSERT_EQ(lhs + rhs, expected_matrix);
+}
+
+TEST(MathOperation, SumRows) {
+    fs::path data_path{glob_test_dir / "sum" };
+    std::ifstream is(data_path / "in2.txt");  
+    Matrix_row<8> lhs = create_matrix_from_file<1, 8>(is);
+    Matrix_row<8> rhs = create_matrix_from_file<1, 8>(is);
+    is.close();
+    is.open(data_path/"out2.txt");
+    MatrixData expected_matrix = create_matrix_data(is, 1, 8);
+    is.close();
+    ASSERT_EQ(lhs + rhs, expected_matrix);
+}
+
+TEST(MathOperation, SumCols) {
+    fs::path data_path{glob_test_dir / "sum" };
+    std::ifstream is(data_path / "in3.txt");  
+    Matrix_col<6> lhs = create_matrix_from_file<6, 1>(is);
+    Matrix_col<6> rhs = create_matrix_from_file<6, 1>(is);
+    is.close();
+    is.open(data_path/"out3.txt");
+    MatrixData expected_matrix = create_matrix_data(is, 6, 1);
+    is.close();
+    ASSERT_EQ(lhs + rhs, expected_matrix);
+}
+
+TEST(MathOperation, SubMatrix) {
+    fs::path data_path{glob_test_dir / "sub" };
+    std::ifstream is(data_path / "in1.txt");  
+    Matrix<6, 9> lhs = create_matrix_from_file<6, 9>(is);
+    Matrix<6, 9> rhs = create_matrix_from_file<6, 9>(is);
+    is.close();
+    is.open(data_path/"out1.txt");
+    MatrixData expected_matrix = create_matrix_data(is, 6, 9);
+    is.close();
+    ASSERT_EQ(lhs - rhs, expected_matrix);
+}
+
+TEST(MathOperation, SubRows) {
+    fs::path data_path{glob_test_dir / "sub" };
+    std::ifstream is(data_path / "in2.txt");  
+    Matrix_row<8> lhs = create_matrix_from_file<1, 8>(is);
+    Matrix_row<8> rhs = create_matrix_from_file<1, 8>(is);
+    is.close();
+    is.open(data_path/"out2.txt");
+    MatrixData expected_matrix = create_matrix_data(is, 1, 8);
+    is.close();
+    ASSERT_EQ(lhs - rhs, expected_matrix);
+}
+
+TEST(MathOperation, SubCols) {
+    fs::path data_path{glob_test_dir / "sub" };
+    std::ifstream is(data_path / "in3.txt");  
+    Matrix_col<6> lhs = create_matrix_from_file<6, 1>(is);
+    Matrix_col<6> rhs = create_matrix_from_file<6, 1>(is);
+    is.close();
+    is.open(data_path/"out3.txt");
+    MatrixData expected_matrix = create_matrix_data(is, 6, 1);
+    is.close();
+    ASSERT_EQ(lhs - rhs, expected_matrix);
+}
+
+
+TEST(MathOperation, ElementWiseMultiplication) {
+    fs::path data_path{glob_test_dir / "elemWiseMul" };
+    std::ifstream is(data_path / "in.txt");  
+    Matrix<5, 6> lhs = create_matrix_from_file<5, 6>(is);
+    Matrix<5, 6> rhs = create_matrix_from_file<5, 6>(is);
+    is.close();
+    is.open(data_path/"out.txt");
+    MatrixData expected_matrix = create_matrix_data(is, 5, 6);
+    is.close();
+    ASSERT_EQ(rhs.mul_elem(lhs), expected_matrix);
+}
+
+TEST(MathOperation, MatrixSumNum) {
+    fs::path data_path{glob_test_dir / "sum" };
+    std::ifstream is(data_path / "in4.txt");  
+    double val = 0;
+    Matrix<4, 8> lhs = create_matrix_from_file<4, 8>(is);
+    is >> val;
+    is.close();
+    is.open(data_path/"out4.txt");
+    MatrixData expected_matrix = create_matrix_data(is, 4, 8);
+    is.close();
+    ASSERT_EQ(lhs + val, expected_matrix);
+}
+TEST(MathOperation,MatrixSubNum) {
+    fs::path data_path{glob_test_dir / "sub" };
+    std::ifstream is(data_path / "in4.txt");  
+    double val = 0;
+    Matrix<4, 8> lhs = create_matrix_from_file<4, 8>(is);
+    is >> val;
+    is.close();
+    is.open(data_path/"out4.txt");
+    MatrixData expected_matrix = create_matrix_data(is, 4, 8);
+    is.close();
+    ASSERT_EQ(lhs - val, expected_matrix);
+}
+
+TEST(MathOperation, MatrixSumRow) {
+    fs::path data_path{glob_test_dir / "sum" };
+    std::ifstream is(data_path / "in5.txt");  
+    Matrix<3, 7> lhs = create_matrix_from_file<3, 7>(is);
+    Matrix_row<7> rhs = create_matrix_from_file<1, 7>(is);
+    is.close();
+    is.open(data_path/"out5.txt");
+    MatrixData expected_matrix = create_matrix_data(is, 3, 7);
+    is.close();
+    ASSERT_EQ(lhs.sum_row(rhs), expected_matrix);
+}
+
+TEST(MathOperation, MatrixSumCol) {
+    fs::path data_path{glob_test_dir / "sum" };
+    std::ifstream is(data_path / "in6.txt");  
+    Matrix<3, 7> lhs = create_matrix_from_file<3, 7>(is);
+    Matrix_col<3> rhs = create_matrix_from_file<3, 1>(is);
+    is.close();
+    is.open(data_path/"out6.txt");
+    MatrixData expected_matrix = create_matrix_data(is, 3, 7);
+    is.close();
+    ASSERT_EQ(lhs.sum_col(rhs), expected_matrix);
+}

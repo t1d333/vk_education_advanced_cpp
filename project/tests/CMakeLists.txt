@@ -9,6 +9,7 @@ ADD_EXECUTABLE(
         src/utils.cpp
         src/creation_test.cpp
         src/Math_tests.cpp
+        src/Getters_test.cpp
 )
 TARGET_LINK_LIBRARIES(tests ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} matrix -lstdc++fs)
 

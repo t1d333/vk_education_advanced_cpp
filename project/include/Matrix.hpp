@@ -67,17 +67,33 @@ class Matrix {
 
     template<size_t rows_rhs, size_t cols_rhs>
     Matrix<rows, cols_rhs>& operator*=(const Matrix<rows_rhs, cols_rhs> &rhs);
+
+    Matrix<rows, cols> operator+(double val) const;
+    Matrix<rows, cols>& operator+=(double val);
+
+    Matrix<rows, cols> operator-(double val) const;
+    Matrix<rows, cols>& operator-=(double val);
     // Getters
     Matrix_row<cols> get_row(size_t n) const;
     Matrix_col<rows> get_col(size_t n) const;
     Matrix_col<rows> get_diag() const;
-
-
     // Multiplication
     template<size_t rows_other, size_t cols_other>
-    Matrix<rows, cols> mul_elem(const Matrix<rows_other, cols_other> &other);
-
+    Matrix<rows, cols> mul_elem(const Matrix<rows_other, cols_other> &other) const;
     // Matrix operations
+    template<size_t dim>
+    Matrix<rows, cols> sum_row(Matrix_row<dim> row) const;
+
+    template<size_t dim>
+    Matrix<rows, cols> sum_col(Matrix_col<dim> col) const;
+
+    template<size_t dim>
+    Matrix<rows, cols> sub_row(Matrix_row<dim> row) const;
+
+    template<size_t dim>
+    Matrix<rows, cols> sub_col(Matrix_col<dim> col) const;
+
+
     Matrix<cols, rows> transp() const;
     Matrix<rows, cols> adj() const;
     Matrix<rows, cols> inv() const;
