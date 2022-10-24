@@ -23,7 +23,7 @@ jobs:
     memtest:
       runs-on: ubuntu-latest
       container: leshiy1295/gcc_linters_valgrind_cmake_gtest
-      needs: [build]
+      needs: [test]
       steps:
         - uses: actions/checkout@v3
         - run: make memtest 
