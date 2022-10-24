@@ -20,11 +20,7 @@ MatrixData create_matrix_data(std::istream& is, size_t rows, size_t cols) {
   return matrix_data;
 }
 
-
-
-
 std::ostream& operator<<(std::ostream& os, const MatrixData& matrix_data) {
-
   for (auto& row: matrix_data) {
     for (auto& data: row) {
       os << data << ' ';

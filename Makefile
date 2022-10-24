@@ -15,3 +15,6 @@ rebuild: clean build
 
 test: rebuild
 	cd build && ctest -V -R
+
+memtest: rebuild
+	./scripts/valgrind.sh

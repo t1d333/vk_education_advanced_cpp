@@ -1,8 +1,6 @@
-#ifdef PROJECT_INCLUDE_MATRIX_HPP_
 #include <array>
 #include <cmath>
 #include <cstddef>
-#include <ctime>
 #include <iostream>
 #include <istream>
 #include <iterator>
@@ -29,6 +27,7 @@ Matrix<rows, cols>::Matrix(const std::array<Matrix_row<cols_other>, count> &arr)
     if ((cols_other != cols) || (count != rows)) {
         throw std::runtime_error("Failed to create matrix");
     }
+
     for (size_t i = 0; i < rows; i++) {
         for (size_t j = 0; j < cols; j++) {
             buffer[i * cols + j] = arr[i](0, j);
@@ -63,6 +62,7 @@ Matrix<rows, cols>::Matrix(const std::array<double, count> &arr) {
 template<size_t rows, size_t cols>
 template<size_t rows_other, size_t cols_other>
 bool Matrix<rows, cols>::operator==(const Matrix<rows_other, cols_other> &other) {
+    const double Epsilon = 1e-7;
     bool flag = ((rows == rows_other) && (cols == cols_other));
     if (flag) {
         for (size_t i = 0; i < cols * rows; i++) {
@@ -317,6 +317,7 @@ double*  Matrix<rows, cols>::get_matrix_winthout_row_and_col(const double* buf, 
         if (i == row) {
             offset_y = 1;
         }
+
         size_t offset_x = 0;
         for (size_t j = 0; j < cols_size - 1; j++) {
             if (j == col) {
@@ -343,7 +344,7 @@ std::ostream& operator<<(std::ostream &os, const Matrix<rows, cols> &matrix) {
 }
 template<size_t rows, size_t cols>
 double Matrix<rows, cols>::get_minor(const double *buf,  size_t rows_size,
-        size_t cols_size, size_t row, size_t col) const {
+    size_t cols_size, size_t row, size_t col) const {
     double* tmp = get_matrix_winthout_row_and_col(buf, rows_size, cols_size, row, col);
     double res  = 0;
     switch (rows_size - 1) {
@@ -362,7 +363,7 @@ double Matrix<rows, cols>::get_minor(const double *buf,  size_t rows_size,
             }
             res = det;
     }
-    delete tmp;
+    delete[] tmp;
     return res;
 }
 
@@ -414,4 +415,3 @@ Matrix<rows, cols> Matrix<rows, cols>::adj() const {
     delete[] tmp;
     return result;
 }
-#endif

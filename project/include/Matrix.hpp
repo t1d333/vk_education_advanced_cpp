@@ -1,5 +1,4 @@
-#ifndef PROJECT_INCLUDE_MATRIX_HPP_
-#define PROJECT_INCLUDE_MATRIX_HPP_
+#pragma once  // NOLINT
 #include <array>
 #include <cstddef>
 #include <iostream>
@@ -25,7 +24,6 @@ class Matrix {
     double get_minor(const double* buf, size_t rows_size, size_t cols_size, size_t row, size_t col) const;
 
  public:
-    static constexpr double Epsilon = 1e-7;
 
     // Constructors
     Matrix() = default;
@@ -102,5 +100,5 @@ class Matrix {
     // Destructor
     ~Matrix() = default;
 };
+
 #include "../src/Matrix.cpp"
-#endif  // PROJECT_INCLUDE_MATRIX_HPP_
