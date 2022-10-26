@@ -6,7 +6,6 @@ INCLUDE_DIRECTORIES(include)
 ADD_EXECUTABLE(
         tests
         src/main.cpp
-        src/utils.cpp
         src/creation_test.cpp
         src/Math_tests.cpp
         src/Getters_test.cpp

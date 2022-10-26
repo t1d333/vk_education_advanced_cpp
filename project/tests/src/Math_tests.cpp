@@ -13,7 +13,7 @@ TEST(MathOperation, NumberMulMatrix) {
     is >> val;
     is.close();
     is.open(data_path/"out1.txt");
-    MatrixData expected_matrix = create_matrix_data(is, 6, 4);
+    Matrix<6, 4> expected_matrix = create_matrix_from_file<6, 4>(is);
     is.close();
     ASSERT_EQ(val * m, expected_matrix);
 }
@@ -26,7 +26,7 @@ TEST(MathOperation, MatrixMulVector) {
     Matrix_col<3> vec = create_matrix_from_file<3, 1>(is);
     is.close();
     is.open(data_path/"out2.txt");
-    MatrixData expected_matrix = create_matrix_data(is, 3, 1);
+    Matrix<3, 1> expected_matrix = create_matrix_from_file<3, 1>(is);
     is.close();
     ASSERT_EQ(m * vec, expected_matrix);
 }
@@ -38,7 +38,7 @@ TEST(MathOperation, VecotrMulMatrix) {
     Matrix_row<4> vec = create_matrix_from_file<1, 4>(is);
     is.close();
     is.open(data_path/"out3.txt");
-    MatrixData expected_matrix = create_matrix_data(is, 1, 5);
+    Matrix<1, 5> expected_matrix = create_matrix_from_file<1, 5>(is);
     is.close();
     ASSERT_EQ(vec * m, expected_matrix);
 }
@@ -50,7 +50,7 @@ TEST(MathOperation, MatrixMulMatrix) {
     Matrix<3, 5> m_rhs = create_matrix_from_file<3, 5>(is);
     is.close();
     is.open(data_path/"out4.txt");
-    MatrixData expected_matrix = create_matrix_data(is, 4, 5);
+    Matrix<4, 5> expected_matrix = create_matrix_from_file<4, 5>(is);
     is.close();
     ASSERT_EQ(m_lhs * m_rhs, expected_matrix);
 }
@@ -62,7 +62,7 @@ TEST(MathOperation, Transp) {
     Matrix<4, 9> m = create_matrix_from_file<4, 9>(is);
     is.close();
     is.open(data_path/"out.txt");
-    MatrixData expected_matrix = create_matrix_data(is, 9, 4);
+    Matrix<9, 4> expected_matrix = create_matrix_from_file<9, 4>(is);
     is.close();
     ASSERT_EQ(m.transp(), expected_matrix);
 }
@@ -87,7 +87,7 @@ TEST(MathOperation, Inv) {
     Matrix<10, 10> m = create_matrix_from_file<10, 10>(is);
     is.close();
     is.open(data_path/"out.txt");
-    MatrixData expected_matrix = create_matrix_data(is, 10, 10);
+    Matrix<10, 10> expected_matrix = create_matrix_from_file<10, 10>(is);
     is.close();
     ASSERT_EQ(m.inv(), expected_matrix);
 }
@@ -99,7 +99,7 @@ TEST(MathOperation, SumMatrix) {
     Matrix<6, 9> rhs = create_matrix_from_file<6, 9>(is);
     is.close();
     is.open(data_path/"out1.txt");
-    MatrixData expected_matrix = create_matrix_data(is, 6, 9);
+    Matrix<6, 9> expected_matrix = create_matrix_from_file<6, 9>(is);
     is.close();
     ASSERT_EQ(lhs + rhs, expected_matrix);
 }
@@ -111,7 +111,7 @@ TEST(MathOperation, SumRows) {
     Matrix_row<8> rhs = create_matrix_from_file<1, 8>(is);
     is.close();
     is.open(data_path/"out2.txt");
-    MatrixData expected_matrix = create_matrix_data(is, 1, 8);
+    Matrix_row<8> expected_matrix = create_matrix_from_file<1, 8>(is);
     is.close();
     ASSERT_EQ(lhs + rhs, expected_matrix);
 }
@@ -123,7 +123,7 @@ TEST(MathOperation, SumCols) {
     Matrix_col<6> rhs = create_matrix_from_file<6, 1>(is);
     is.close();
     is.open(data_path/"out3.txt");
-    MatrixData expected_matrix = create_matrix_data(is, 6, 1);
+    Matrix_col<6> expected_matrix = create_matrix_from_file<6, 1>(is);
     is.close();
     ASSERT_EQ(lhs + rhs, expected_matrix);
 }
@@ -135,7 +135,7 @@ TEST(MathOperation, SubMatrix) {
     Matrix<6, 9> rhs = create_matrix_from_file<6, 9>(is);
     is.close();
     is.open(data_path/"out1.txt");
-    MatrixData expected_matrix = create_matrix_data(is, 6, 9);
+    Matrix<6, 9> expected_matrix = create_matrix_from_file<6, 9>(is);
     is.close();
     ASSERT_EQ(lhs - rhs, expected_matrix);
 }
@@ -147,7 +147,7 @@ TEST(MathOperation, SubRows) {
     Matrix_row<8> rhs = create_matrix_from_file<1, 8>(is);
     is.close();
     is.open(data_path/"out2.txt");
-    MatrixData expected_matrix = create_matrix_data(is, 1, 8);
+    Matrix_row<8> expected_matrix = create_matrix_from_file<1, 8>(is);
     is.close();
     ASSERT_EQ(lhs - rhs, expected_matrix);
 }
@@ -159,7 +159,7 @@ TEST(MathOperation, SubCols) {
     Matrix_col<6> rhs = create_matrix_from_file<6, 1>(is);
     is.close();
     is.open(data_path/"out3.txt");
-    MatrixData expected_matrix = create_matrix_data(is, 6, 1);
+    Matrix_col<6> expected_matrix = create_matrix_from_file<6, 1>(is);
     is.close();
     ASSERT_EQ(lhs - rhs, expected_matrix);
 }
@@ -172,7 +172,7 @@ TEST(MathOperation, ElementWiseMultiplication) {
     Matrix<5, 6> rhs = create_matrix_from_file<5, 6>(is);
     is.close();
     is.open(data_path/"out.txt");
-    MatrixData expected_matrix = create_matrix_data(is, 5, 6);
+    Matrix<5, 6> expected_matrix = create_matrix_from_file<5, 6>(is);
     is.close();
     ASSERT_EQ(rhs.mul_elem(lhs), expected_matrix);
 }
@@ -185,7 +185,7 @@ TEST(MathOperation, MatrixSumNum) {
     is >> val;
     is.close();
     is.open(data_path/"out4.txt");
-    MatrixData expected_matrix = create_matrix_data(is, 4, 8);
+    Matrix<4, 8> expected_matrix = create_matrix_from_file<4, 8>(is);
     is.close();
     ASSERT_EQ(lhs + val, expected_matrix);
 }
@@ -197,7 +197,7 @@ TEST(MathOperation,MatrixSubNum) {
     is >> val;
     is.close();
     is.open(data_path/"out4.txt");
-    MatrixData expected_matrix = create_matrix_data(is, 4, 8);
+    Matrix<4, 8> expected_matrix = create_matrix_from_file<4, 8>(is);
     is.close();
     ASSERT_EQ(lhs - val, expected_matrix);
 }
@@ -209,7 +209,7 @@ TEST(MathOperation, MatrixSumRow) {
     Matrix_row<7> rhs = create_matrix_from_file<1, 7>(is);
     is.close();
     is.open(data_path/"out5.txt");
-    MatrixData expected_matrix = create_matrix_data(is, 3, 7);
+    Matrix<3, 7> expected_matrix = create_matrix_from_file<3, 7>(is);
     is.close();
     ASSERT_EQ(lhs.sum_row(rhs), expected_matrix);
 }
@@ -221,7 +221,7 @@ TEST(MathOperation, MatrixSumCol) {
     Matrix_col<3> rhs = create_matrix_from_file<3, 1>(is);
     is.close();
     is.open(data_path/"out6.txt");
-    MatrixData expected_matrix = create_matrix_data(is, 3, 7);
+    Matrix<3, 7> expected_matrix = create_matrix_from_file<3, 7>(is);
     is.close();
     ASSERT_EQ(lhs.sum_col(rhs), expected_matrix);
 }
