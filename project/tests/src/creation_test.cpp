@@ -16,7 +16,15 @@ TEST(MatrixCreation, CreationFromNumbersArray) {
     m_stream.close();
     ASSERT_EQ(matrix, expected_matrix);
 } 
-
+TEST(MatrixCreation, CreationFromInitializerList) {
+    Matrix<2, 2> matrix{1, 2, 3, 4};
+    Matrix<2, 2> expected_matrix;
+    expected_matrix(0, 0) = 1;
+    expected_matrix(0, 1) = 2;
+    expected_matrix(1, 0) = 3;
+    expected_matrix(1, 1) = 4;
+    ASSERT_EQ(matrix, expected_matrix);
+}
 TEST(MatrixCreation, CreationFromVectorsRows) {
     fs::path data_path{glob_test_dir / "creation" / "in3.txt"};
     std::ifstream m_stream(data_path);  

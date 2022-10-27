@@ -1,6 +1,7 @@
 #pragma once  // NOLINT
 #include <array>
 #include <cstddef>
+#include <initializer_list>
 #include <iostream>
 #include <istream>
 
@@ -38,6 +39,9 @@ class Matrix {
 
     template<size_t count>
     explicit Matrix(const std::array<double, count> &arr);
+
+    explicit Matrix(std::initializer_list<double> list);
+
     // Operators
 
     Matrix<rows, cols>& operator=(const Matrix<rows, cols> &rhs);

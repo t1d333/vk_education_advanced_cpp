@@ -24,7 +24,7 @@ Matrix<rows, cols>& Matrix<rows, cols>::operator=(const Matrix<rows, cols> &rhs)
 template<size_t rows, size_t cols>
 template<size_t cols_other, size_t count>
 Matrix<rows, cols>::Matrix(const std::array<Matrix_row<cols_other>, count> &arr) {
-    if ((cols_other != cols) || (count != rows)) {
+    if ((cols_other != cols) || (count != rows) || (rows == 0)) {
         throw std::runtime_error("Failed to create matrix");
     }
 
@@ -38,7 +38,7 @@ Matrix<rows, cols>::Matrix(const std::array<Matrix_row<cols_other>, count> &arr)
 template<size_t rows, size_t cols>
 template<size_t rows_other, size_t count>
 Matrix<rows, cols>::Matrix(const std::array<Matrix_col<rows_other>, count> &arr) {
-    if ((rows_other != rows) || (cols != count)) {
+    if (((rows_other != rows) || (cols != count)) || (rows == 0)) {
         throw std::runtime_error("Failed to create matrix");
     }
 
@@ -53,12 +53,19 @@ Matrix<rows, cols>::Matrix(const std::array<Matrix_col<rows_other>, count> &arr)
 template<size_t rows, size_t cols>
 template<size_t count>
 Matrix<rows, cols>::Matrix(const std::array<double, count> &arr) {
-    if (count != rows * cols) {
-        throw "Failed to create matrix from numbers";
+    if ((count != rows * cols) || (rows == 0)) {
+        throw std::runtime_error("Failed to create matrix");
     }
     std::copy(arr.begin(), arr.end(), buffer.begin());
 }
 
+template<size_t rows, size_t cols>
+Matrix<rows, cols>::Matrix(std::initializer_list<double> list) {
+    if ((list.size() > (rows * cols)) || (rows == 0)) {
+        throw std::runtime_error("Failed to create matrix");
+    }
+    std::copy(list.begin(), list.end(), buffer.begin());
+}
 
 template<size_t rows, size_t cols, size_t rows_other, size_t cols_other>
 bool operator==(const Matrix<rows, cols> &lhs, const Matrix<rows_other, cols_other> &rhs) {
