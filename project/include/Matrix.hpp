@@ -4,7 +4,7 @@
 #include <initializer_list>
 #include <iostream>
 #include <istream>
-
+#include <vector>
 
 template<size_t rows, size_t cols>
 class Matrix;
@@ -31,14 +31,11 @@ class Matrix {
 
     Matrix(const Matrix<rows, cols> &other);
 
-    template<size_t cols_other, size_t count>
-    explicit Matrix(const std::array<Matrix_row<cols_other>, count> &arr);
+    explicit Matrix(const std::array<Matrix_row<cols>, rows> &arr);
 
-    template<size_t rows_other, size_t count>
-    explicit Matrix(const std::array<Matrix_col<rows_other>, count> &arr);
+    explicit Matrix(const std::array<Matrix_col<rows>, cols> &arr);
 
-    template<size_t count>
-    explicit Matrix(const std::array<double, count> &arr);
+    explicit Matrix(const std::array<double, rows * cols> &arr);
 
     explicit Matrix(std::initializer_list<double> list);
 
@@ -67,12 +64,18 @@ class Matrix {
     Matrix<rows, cols> operator+(double val) const;
     Matrix<rows, cols>& operator+=(double val);
 
+    std::vector<double> slice(size_t i, size_t j, int k) const;
+
+    std::vector<double> slice(size_t i, size_t j) const;
+
+    std::vector<double> slice(size_t i) const;
+
     Matrix<rows, cols> operator-(double val) const;
     Matrix<rows, cols>& operator-=(double val);
     // Getters
     Matrix_row<cols> get_row(size_t n) const;
     Matrix_col<rows> get_col(size_t n) const;
-    Matrix_col<rows> get_diag() const;
+    std::array<double, rows> get_diag() const;
     // Multiplication
     Matrix<rows, cols> mul_elem(const Matrix<rows, cols> &other) const;
     // Matrix operations

@@ -1,12 +1,14 @@
 #include <array>
 #include <cmath>
 #include <cstddef>
+#include <exception>
 #include <iostream>
 #include <istream>
 #include <iterator>
 #include <stdexcept>
 #include <limits>
 #include <iomanip>
+#include <vector>
 
 template<size_t rows, size_t cols>
 Matrix<rows, cols>::Matrix(const Matrix<rows, cols> &other) {
@@ -22,12 +24,7 @@ Matrix<rows, cols>& Matrix<rows, cols>::operator=(const Matrix<rows, cols> &rhs)
 }
 
 template<size_t rows, size_t cols>
-template<size_t cols_other, size_t count>
-Matrix<rows, cols>::Matrix(const std::array<Matrix_row<cols_other>, count> &arr) {
-    if ((cols_other != cols) || (count != rows) || (rows == 0)) {
-        throw std::runtime_error("Failed to create matrix");
-    }
-
+Matrix<rows, cols>::Matrix(const std::array<Matrix_row<cols>, rows> &arr) {
     for (size_t i = 0; i < rows; i++) {
         for (size_t j = 0; j < cols; j++) {
             buffer[i * cols + j] = arr[i](0, j);
@@ -36,12 +33,7 @@ Matrix<rows, cols>::Matrix(const std::array<Matrix_row<cols_other>, count> &arr)
 }
 
 template<size_t rows, size_t cols>
-template<size_t rows_other, size_t count>
-Matrix<rows, cols>::Matrix(const std::array<Matrix_col<rows_other>, count> &arr) {
-    if (((rows_other != rows) || (cols != count)) || (rows == 0)) {
-        throw std::runtime_error("Failed to create matrix");
-    }
-
+Matrix<rows, cols>::Matrix(const std::array<Matrix_col<rows>, cols> &arr) {
     for (size_t i = 0; i < rows; i++) {
         for (size_t j = 0; j < cols; j++) {
             buffer[i * cols + j] = arr[j](i, 0);
@@ -51,11 +43,7 @@ Matrix<rows, cols>::Matrix(const std::array<Matrix_col<rows_other>, count> &arr)
 
 
 template<size_t rows, size_t cols>
-template<size_t count>
-Matrix<rows, cols>::Matrix(const std::array<double, count> &arr) {
-    if ((count != rows * cols) || (rows == 0)) {
-        throw std::runtime_error("Failed to create matrix");
-    }
+Matrix<rows, cols>::Matrix(const std::array<double, rows * cols> &arr) {
     std::copy(arr.begin(), arr.end(), buffer.begin());
 }
 
@@ -97,6 +85,37 @@ double Matrix<rows, cols>::operator()(size_t i, size_t j) const {
     return buffer[i * cols + j];
 }
 
+
+template<size_t rows, size_t cols>
+std::vector<double> Matrix<rows, cols>::slice(size_t i, size_t j, int k) const {
+    std::vector<double> result;
+    if ((i < j) && (k > 0)) {
+        for (; i < j; i+=k) {
+            result.push_back(buffer[i]);
+        }
+    } else if ((i > j) && (k < 0)) {
+        for (; j < i; i+=k) {
+            result.push_back(buffer[i]);
+
+            if (i < size_t(-k)) {
+                break;
+            }
+        }
+    } else {
+        throw std::runtime_error("Invalid Arguments");
+    }
+    return result;
+}
+template<size_t rows, size_t cols>
+std::vector<double> Matrix<rows, cols>::slice(size_t i, size_t j) const {
+    return slice(i, j, 1);
+}
+
+
+template<size_t rows, size_t cols>
+std::vector<double> Matrix<rows, cols>::slice(size_t i) const {
+    return slice(i, buffer.size());
+}
 template<size_t rows, size_t cols>
 Matrix<rows, cols> operator*(double val, const Matrix<rows, cols>& matrix) {
     Matrix<rows, cols> result;
@@ -197,12 +216,15 @@ Matrix<rows, cols> Matrix<rows, cols>::sum_row(Matrix_row<dim> row) const {
     if (dim != cols) {
         throw std::runtime_error("Dimension mismatch");
     }
+
     Matrix<rows, cols> result;
+
     for (size_t i = 0; i < rows; i++) {
         for (size_t j = 0; j < cols; j++) {
             result(i, j) = (*this)(i, j) + row(0, j);
         }
     }
+
     return result;
 }
 
@@ -212,12 +234,15 @@ Matrix<rows, cols> Matrix<rows, cols>::sum_col(Matrix_col<dim> col) const {
     if (dim != rows) {
         throw std::runtime_error("Dimension mismatch");
     }
+
     Matrix<rows, cols> result;
+
     for (size_t i = 0; i < rows; i++) {
         for (size_t j = 0; j < cols; j++) {
             result(i, j) = (*this)(i, j) + col(i, 0);
         }
     }
+
     return result;
 }
 
@@ -225,22 +250,23 @@ Matrix<rows, cols> Matrix<rows, cols>::sum_col(Matrix_col<dim> col) const {
 template<size_t rows, size_t cols>
 Matrix_col<rows> Matrix<rows, cols>::get_col(size_t n) const {
     Matrix_col<rows> result;
+
     for (size_t i = 0; i < rows; i++) {
         result(i, 0) = buffer[i * cols + n];
     }
+
     return result;
 }
 
 
 template<size_t rows, size_t cols>
-Matrix_col<rows> Matrix<rows, cols>::get_diag() const {
-    if (rows != cols) {
-        throw std::runtime_error("Invalid matrix");
-    }
-    Matrix_col<rows>result;
+std::array<double, rows> Matrix<rows, cols>::get_diag() const {
+    std::array<double, rows> result;
+
     for (size_t i = 0; i < rows; i++) {
-            result(i, 0) = (*this)(i, i);
+            result[i] = (*this)(i, i);
     }
+
     return result;
 }
 
@@ -250,6 +276,7 @@ template<size_t rows, size_t cols>
 template<size_t cols_rhs>
 Matrix<rows, cols_rhs> Matrix<rows, cols>::operator*(const Matrix<cols, cols_rhs> &rhs) const {
     Matrix<rows, cols_rhs> result;
+
     for (size_t i = 0; i < rows; i++) {
         for (size_t j = 0; j < cols_rhs; j++) {
             result(i, j) = 0;
@@ -258,6 +285,7 @@ Matrix<rows, cols_rhs> Matrix<rows, cols>::operator*(const Matrix<cols, cols_rhs
             }
         }
     }
+
     return result;
 }
 
@@ -296,6 +324,7 @@ template<size_t rows, size_t cols>
 Matrix<rows - 1, cols - 1> Matrix<rows, cols>::get_matrix_winthout_row_and_col(size_t row, size_t col) const {
     Matrix<rows - 1, cols - 1> result;
     size_t offset_y = 0;
+
     for (size_t i = 0; i < rows - 1; i++) {
         if (i == row) {
             offset_y = 1;
@@ -309,6 +338,7 @@ Matrix<rows - 1, cols - 1> Matrix<rows, cols>::get_matrix_winthout_row_and_col(s
             result(i, j) = (*this)(i + offset_y, j + offset_x);
         }
     }
+
     return result;
 }
 
@@ -382,14 +412,13 @@ Matrix<rows, cols> Matrix<rows, cols>::inv() const {
 
 template<size_t rows, size_t cols>
 Matrix<rows, cols> Matrix<rows, cols>::adj() const {
-    Matrix<rows, cols>  result;
-    double deg = 1;
+    Matrix<rows, cols> result;
+    int deg = 1;
     for (size_t i = 0; i < rows; i++) {
         for (size_t j = 0; j < cols; j++) {
             result(i, j) = deg * get_minor(j, i);
             deg *= -1;
         }
-        deg *= -1;
     }
     return result;
 }

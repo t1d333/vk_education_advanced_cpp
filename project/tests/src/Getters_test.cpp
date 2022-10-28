@@ -1,58 +1,107 @@
-#include "../include/utils.hpp"
+#include <array>
 #include <cmath>
 #include <cstddef>
 #include <fstream>
 #include <gtest/gtest.h>
-#include <array>
+#include <vector>
+#include "../../include/Matrix.hpp"
 
 TEST(GettersTest, GetElem) {
-    fs::path data_path{glob_test_dir / "getters" };
-    std::ifstream is(data_path / "in1.txt");  
-    Matrix<4, 6> m = create_matrix_from_file<4, 6>(is);
-    size_t i = 0;
-    size_t j = 0;
-    is >> i >> j;
-    is.close();
-    is.open(data_path/"out1.txt");
-    double val = 0;
-    is >> val;
-    is.close();
-    ASSERT_EQ(val, m(i, j));
+    Matrix<4, 6> m{3, 4, 21, 31, 321, 3,
+                   1, 0, 9, -2, 8, -10,
+                   7, -56, 43, 23, 1, -11,
+                   23, 44, -9, 87, 13, 43
+
+    };
+
+    ASSERT_EQ(m(3, 4), 13);
 }
 
 TEST(GettersTest, GetRow) {
-    fs::path data_path{glob_test_dir / "getters" };
-    std::ifstream is(data_path / "in2.txt");  
-    Matrix<4, 5> m = create_matrix_from_file<4, 5>(is);
-    size_t i = 0;
-    is >> i;
-    is.close();
-    is.open(data_path/"out2.txt");
-    Matrix_row<5> expected_row = create_matrix_from_file<1, 5>(is);
-    is.close();
-    ASSERT_EQ(expected_row, m.get_row(i));
+    Matrix<4, 5> m{
+        23, -2, 31, 1, 10,
+        90, 84, 12, 7, 777,
+        228, 3, 3,  4, -9,
+        12,  3, 4, -3, -3,
+    };
+
+    Matrix_row<5> expected_row{
+        228, 3, 3,  4, -9
+    };
+
+    ASSERT_EQ(expected_row, m.get_row(2));
 }
 
 TEST(GettersTest, GetCol) {
-    fs::path data_path{glob_test_dir / "getters" };
-    std::ifstream is(data_path / "in3.txt");  
-    Matrix<6, 4> m = create_matrix_from_file<6, 4>(is);
-    size_t i = 0;
-    is >> i;
-    is.close();
-    is.open(data_path/"out3.txt");
-    Matrix_col<6> expected_col = create_matrix_from_file<6, 1>(is);
-    is.close();
-    ASSERT_EQ(expected_col, m.get_col(i));
+    Matrix<6, 4> m{
+        3, 12, 3, 432,
+        -90, 21, 2, 31,
+        100, -21, 3,  43,
+        89, 77, 64, 34,
+        -71, -13, -12, 11,
+        32, 21, 32, 32
+    };
+
+    Matrix_col<6> expected_col{
+        3, -90, 100, 89, -71, 32 
+    };
+
+    ASSERT_EQ(expected_col, m.get_col(0));
 }
 
 TEST(GettersTest, GetDiag) {
-    fs::path data_path{glob_test_dir / "getters" };
-    std::ifstream is(data_path / "in4.txt");  
-    Matrix<5, 5> m = create_matrix_from_file<5, 5>(is);
-    is.close();
-    is.open(data_path/"out4.txt");
-    Matrix_col<5> expected_diag = create_matrix_from_file<5, 1>(is);
-    is.close();
+    Matrix<5, 5> m{
+        3, -10, 2, 4, 45,
+        -1, 2, 0, 19, 23,
+        10, -1, -3, 12, 12,
+        63, 23, -16, -90, 0,
+        17, 12, -13, -10, 0
+    };
+
+    std::array<double, 5> expected_diag{
+        3, 2, -3, -90, 0
+    };
+
     ASSERT_EQ(expected_diag, m.get_diag());
+}
+
+TEST(GettersTest, Slice1) {
+    Matrix<3, 3> m {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 10
+    };
+    std::vector<double> expected {1, 4, 7};
+    ASSERT_EQ(m.slice(0, 9, 3), expected);
+}
+
+
+TEST(GettersTest, Slice2) {
+    Matrix<3, 3> m {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 10
+    };
+    std::vector<double> expected {5, 4, 3, 2};
+    ASSERT_EQ(m.slice(4,  0, -1), expected);
+}
+
+TEST(GettersTest, Slice3) {
+    Matrix<3, 3> m {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 10
+    };
+    std::vector<double> expected {4, 5, 6, 7};
+    ASSERT_EQ(m.slice(3,  7), expected);
+}
+
+TEST(GettersTest, Slice4) {
+    Matrix<3, 3> m {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 10
+    };
+    std::vector<double> expected {7, 8, 10};
+    ASSERT_EQ(m.slice(6), expected);
 }

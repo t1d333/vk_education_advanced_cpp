@@ -1,8 +1,6 @@
 FIND_PACKAGE(GTest REQUIRED)
 FIND_PACKAGE(Threads REQUIRED)
 
-INCLUDE_DIRECTORIES(include)
-
 ADD_EXECUTABLE(
         tests
         src/main.cpp
