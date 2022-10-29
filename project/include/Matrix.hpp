@@ -22,6 +22,7 @@ class Matrix {
 
     Matrix<rows - 1, cols - 1> get_matrix_winthout_row_and_col(size_t row, size_t col) const;
 
+    size_t find_slice_len(size_t begin, size_t end, int step) const;
 
     double get_minor(size_t row, size_t col) const;
 
@@ -64,12 +65,23 @@ class Matrix {
     Matrix<rows, cols> operator+(double val) const;
     Matrix<rows, cols>& operator+=(double val);
 
-    std::vector<double> slice(size_t i, size_t j, int k) const;
+    std::vector<double> slice(size_t begin, size_t end, int step) const;
 
-    std::vector<double> slice(size_t i, size_t j) const;
+    std::vector<double> slice(size_t begin, size_t end) const;
 
-    std::vector<double> slice(size_t i) const;
+    std::vector<double> slice(size_t begin) const;
 
+    std::vector<Matrix_row<cols>> slice_row(size_t begin, size_t end, int step) const;
+
+    std::vector<Matrix_row<cols>> slice_row(size_t begin, size_t end) const;
+
+    std::vector<Matrix_row<cols>> slice_row(size_t begin) const;
+
+    std::vector<Matrix_col<rows>> slice_col(size_t begin, size_t end, int step) const;
+
+    std::vector<Matrix_col<rows>> slice_col(size_t begin, size_t end) const;
+
+    std::vector<Matrix_col<rows>> slice_col(size_t begin) const;
     Matrix<rows, cols> operator-(double val) const;
     Matrix<rows, cols>& operator-=(double val);
     // Getters

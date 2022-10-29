@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstddef>
@@ -87,39 +88,37 @@ double Matrix<rows, cols>::operator()(size_t i, size_t j) const {
 
 
 template<size_t rows, size_t cols>
-std::vector<double> Matrix<rows, cols>::slice(size_t i, size_t j, int k) const {
-    std::vector<double> result;
-    if ((i > rows * cols) || (j > rows * cols)) {
+size_t Matrix<rows, cols>::find_slice_len(size_t begin, size_t end, int step) const {
+    size_t len = begin > end ? begin - end : end - begin;
+    return std::max((size_t)ceil(len / std::fabs(step)), (size_t)1);
+}
+
+template<size_t rows, size_t cols>
+std::vector<double> Matrix<rows, cols>::slice(size_t begin, size_t end, int step) const {
+    if ((begin > rows * cols) || (end > rows * cols) || (step == 0)) {
         throw std::runtime_error("Invalid Arguments");
     }
 
-    if ((i < j) && (k > 0)) {
-        for (; i < j; i+=k) {
-            result.push_back(buffer[i]);
-        }
-    } else if ((i > j) && (k < 0)) {
-        for (; j < i; i+=k) {
-            result.push_back(buffer[i]);
+    size_t len = find_slice_len(begin, end, step);
 
-            if (i < size_t(-k)) {
-                break;
-            }
-        }
-    } else {
-        throw std::runtime_error("Invalid Arguments");
+    std::vector<double> result(len);
+
+    for (size_t i = 0; i < len; i++) {
+        result[i] = buffer[begin];
+        begin+=step;
     }
-
     return result;
 }
+
 template<size_t rows, size_t cols>
-std::vector<double> Matrix<rows, cols>::slice(size_t i, size_t j) const {
-    return slice(i, j, 1);
+std::vector<double> Matrix<rows, cols>::slice(size_t begin, size_t end) const {
+    return slice(begin, end, 1);
 }
 
 
 template<size_t rows, size_t cols>
-std::vector<double> Matrix<rows, cols>::slice(size_t i) const {
-    return slice(i, buffer.size());
+std::vector<double> Matrix<rows, cols>::slice(size_t begin) const {
+    return slice(begin, buffer.size());
 }
 template<size_t rows, size_t cols>
 Matrix<rows, cols> operator*(double val, const Matrix<rows, cols>& matrix) {
@@ -130,6 +129,56 @@ Matrix<rows, cols> operator*(double val, const Matrix<rows, cols>& matrix) {
         }
     }
     return result;
+}
+
+template<size_t rows, size_t cols>
+std::vector<Matrix_row<cols>> Matrix<rows, cols>::slice_row(size_t begin, size_t end, int step) const {
+    if ((begin > rows) || (end > rows)) {
+        throw std::runtime_error("Invalid Arguments");
+    }
+
+    size_t len = find_slice_len(begin, end, step);
+    std::vector<Matrix_row<cols>> result(len);
+    for (size_t i = 0; i < len; i++) {
+        result[i] = get_row(begin);
+        begin += step;
+    }
+    return result;
+}
+
+template<size_t rows, size_t cols>
+std::vector<Matrix_row<cols>> Matrix<rows, cols>::slice_row(size_t begin, size_t end) const {
+    return slice_row(begin, end, 1);
+}
+
+template<size_t rows, size_t cols>
+std::vector<Matrix_row<cols>> Matrix<rows, cols>::slice_row(size_t begin) const {
+    return slice_row(begin, rows, 1);
+}
+
+template<size_t rows, size_t cols>
+std::vector<Matrix_col<rows>> Matrix<rows, cols>::slice_col(size_t begin, size_t end, int step) const {
+    if ((begin > cols) || (end > cols)) {
+        throw std::runtime_error("Invalid Arguments");
+    }
+
+    size_t len = find_slice_len(begin, end, step);
+    std::vector<Matrix_col<rows>> result(len);
+    for (size_t i = 0; i < len; i++) {
+        result[i] = get_col(begin);
+        begin += step;
+    }
+    return result;
+}
+
+template<size_t rows, size_t cols>
+std::vector<Matrix_col<rows>> Matrix<rows, cols>::slice_col(size_t begin, size_t end) const {
+    return slice_col(begin, end, 1);
+}
+
+template<size_t rows, size_t cols>
+std::vector<Matrix_col<rows>> Matrix<rows, cols>::slice_col(size_t begin) const {
+    return slice_col(begin, cols, 1);
 }
 
 

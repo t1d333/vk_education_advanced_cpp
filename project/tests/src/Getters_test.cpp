@@ -105,3 +105,118 @@ TEST(GettersTest, Slice4) {
     std::vector<double> expected {7, 8, 10};
     ASSERT_EQ(m.slice(6), expected);
 }
+
+TEST(GettersTest, Slice5) {
+    Matrix<3, 3> m {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 10
+    };
+    std::vector<double> expected {1, 3, 5, 7};
+    ASSERT_EQ(m.slice(0, 7, 2), expected);
+}
+TEST(GettersTest, SliceRows1) {
+    Matrix<5, 3> m {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 10,
+        11, 12, 13,
+        14, 14, 15
+    };
+    std::vector<Matrix_row<3>> expected(2);
+    expected[0] = Matrix_row<3>{1, 2, 3};
+    expected[1] = Matrix_row<3>{11, 12, 13};
+    ASSERT_EQ(m.slice_row(0, 5, 3), expected);
+}
+
+
+TEST(GettersTest, SliceRows2) {
+    Matrix<5, 3> m {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 10,
+        11, 12, 13,
+        14, 14, 15
+    };
+    std::vector<Matrix_row<3>> expected(2);
+    expected[0] = Matrix_row<3>{7, 8, 10};
+    expected[1] = Matrix_row<3>{4, 5, 6};
+    ASSERT_EQ(m.slice_row(2, 0, -1), expected);
+}
+
+TEST(GettersTest, SliceRows3) {
+    Matrix<5, 3> m {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 10,
+        11, 12, 13,
+        14, 14, 15
+    };
+    std::vector<Matrix_row<3>> expected(2);
+    expected[0] = Matrix_row<3>{11, 12, 13};
+    expected[1] = Matrix_row<3>{14, 14, 15};
+    ASSERT_EQ(m.slice_row(3, 5), expected);
+}
+
+TEST(GettersTest, SliceRows4) {
+    Matrix<5, 3> m {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 10,
+        11, 12, 13,
+        14, 14, 15
+    };
+    std::vector<Matrix_row<3>> expected(1);
+    expected[0] = Matrix_row<3>{14, 14, 15};
+    ASSERT_EQ(m.slice_row(4), expected);
+}
+
+TEST(GettersTest, SliceCols1) {
+    Matrix<3, 5> m {
+        1, 2, 3, 4, 5,
+        6, 7, 8, 9, 10, 
+        11, 12, 13, 14, 15
+    };
+    std::vector<Matrix_col<3>> expected(2);
+    expected[0] = Matrix_col<3>{1, 6, 11};
+    expected[1] = Matrix_col<3>{4, 9, 14};
+    ASSERT_EQ(m.slice_col(0, 5, 3), expected);
+}
+
+
+TEST(GettersTest, SliceCols2) {
+    Matrix<3, 5> m {
+        1, 2, 3, 4, 5,
+        6, 7, 8, 9, 10, 
+        11, 12, 13, 14, 15
+    };
+    std::vector<Matrix_col<3>> expected(2);
+    expected[0] = Matrix_col<3>{5, 10, 15};
+    expected[1] = Matrix_col<3>{4, 9, 14};
+    ASSERT_EQ(m.slice_col(4, 2, -1), expected);
+}
+
+TEST(GettersTest, SliceCols3) {
+    Matrix<3, 5> m {
+        1, 2, 3, 4, 5,
+        6, 7, 8, 9, 10, 
+        11, 12, 13, 14, 15
+    };
+    std::vector<Matrix_col<3>> expected(3);
+    expected[0] = Matrix_col<3>{3, 8, 13};
+    expected[1] = Matrix_col<3>{4, 9, 14};
+    expected[2] = Matrix_col<3>{5, 10, 15};
+    ASSERT_EQ(m.slice_col(2, 5), expected);
+}
+
+TEST(GettersTest, SliceCols4) {
+    Matrix<3, 5> m {
+        1, 2, 3, 4, 5,
+        6, 7, 8, 9, 10, 
+        11, 12, 13, 14, 15
+    };
+    std::vector<Matrix_col<3>> expected(2);
+    expected[0] = Matrix_col<3>{4, 9, 14};
+    expected[1] = Matrix_col<3>{5, 10, 15};
+    ASSERT_EQ(m.slice_col(3), expected);
+}
