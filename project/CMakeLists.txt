@@ -1,0 +1,4 @@
+INCLUDE_DIRECTORIES(include)
+ADD_LIBRARY(matrix STATIC src/Tmp.cpp)
+
+ADD_SUBDIRECTORY(tests)
