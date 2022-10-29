@@ -89,6 +89,10 @@ double Matrix<rows, cols>::operator()(size_t i, size_t j) const {
 template<size_t rows, size_t cols>
 std::vector<double> Matrix<rows, cols>::slice(size_t i, size_t j, int k) const {
     std::vector<double> result;
+    if ((i > rows * cols) || (j > rows * cols)) {
+        throw std::runtime_error("Invalid Arguments");
+    }
+
     if ((i < j) && (k > 0)) {
         for (; i < j; i+=k) {
             result.push_back(buffer[i]);
@@ -104,6 +108,7 @@ std::vector<double> Matrix<rows, cols>::slice(size_t i, size_t j, int k) const {
     } else {
         throw std::runtime_error("Invalid Arguments");
     }
+
     return result;
 }
 template<size_t rows, size_t cols>
