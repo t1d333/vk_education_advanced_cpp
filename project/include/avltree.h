@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <vector>
 
 template <typename T> class Set;
 
@@ -38,6 +39,7 @@ private:
 public:
   Node<T> *root;
 
+  void getData(Node<T> *root, std::vector<T> &buf);
   AVLTree() : root(nullptr) {}
   ~AVLTree();
 
@@ -87,6 +89,15 @@ void AVLTree<T>::printTree(Node<T> *root, std::string indent, bool last) {
     std::cout << root->key << std::endl;
     printTree(root->left, indent, false);
     printTree(root->right, indent, true);
+  }
+}
+
+template <typename T>
+void AVLTree<T>::getData(Node<T> *root, std::vector<T> &buf) {
+  if (root != nullptr) {
+    getData(root->left, buf);
+    buf.push_back(root->key);
+    getData(root->right, buf);
   }
 }
 

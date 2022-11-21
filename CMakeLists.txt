@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 3.18.0)
-PROJECT(matrix)
+PROJECT(stdset)
 
 SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -fprofile-arcs -ftest-coverage -fPIC -O0")

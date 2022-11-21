@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <initializer_list>
 #include <iterator>
+#include <vector>
 
 template <typename T> class Set {
 private:
@@ -24,6 +25,7 @@ public:
 
   size_t size() const;
   bool empty() const;
+  void getData(std::vector<T> &buf);
 };
 
 template <typename T>
@@ -34,6 +36,10 @@ Set<T>::Set(InputIt first, InputIt last) {
     tree->insert(*first, flag);
     len += flag ? 1 : 0;
   }
+}
+
+template <typename T> void Set<T>::getData(std::vector<T> &buf) {
+  tree->getData(tree->root, buf);
 }
 
 template <typename T> Set<T>::~Set<T>() { delete tree; }
