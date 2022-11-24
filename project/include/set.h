@@ -1,18 +1,67 @@
 #pragma once // NOLINT
 
 #include "avltree.h"
+#include <algorithm>
 #include <cstddef>
 #include <initializer_list>
 #include <iterator>
+#include <memory>
 #include <vector>
 
 template <typename T> class Set {
 private:
-  AVLTree<T> *tree;
   size_t len;
 
+  AVLTree<T> *tree;
+
 public:
-  void print() { tree->printTree(tree->root, "", true); }
+  class iterator {
+  public:
+    iterator() : ptr(nullptr){};
+    iterator(const iterator &it) : ptr(it.ptr) {}
+    explicit iterator(Node<T> *node) : ptr(node) {}
+    iterator &operator=(const iterator &it) {
+      if (this != &it) {
+        ptr = it.ptr;
+      }
+      return *this;
+    }
+    bool operator==(const iterator &it) const { return ptr == it.ptr; }
+    bool operator!=(const iterator &it) const { return ptr != it.ptr; }
+    bool operator<(const iterator &it) const { return **this < *it; }
+    bool operator>(const iterator &it) const { return **this > *it; }
+    bool operator<=(const iterator &it) const { return **this <= *it; }
+
+    bool operator>=(const iterator &it) const { return **this >= *it; }
+    const T &operator*() const { return ptr->key; }
+    const T *operator->() const { return &(ptr->key); };
+    iterator operator++() {
+      if (ptr->next == nullptr) {
+        return *this;
+      }
+      ptr = ptr->next;
+      return *this;
+    }
+    iterator operator--() {
+      ptr = ptr->prev;
+      return *this;
+    }
+
+    iterator operator++(int) {
+      iterator old(*this);
+      ++(*this);
+      return old;
+    }
+    iterator operator--(int) {
+      iterator old(*this);
+      --(*this);
+      return old;
+    }
+
+  private:
+    Node<T> *ptr;
+  };
+
   Set();
   Set(std::initializer_list<T>);
   Set(const Set<T> &other);
@@ -20,17 +69,26 @@ public:
   Set<T> &operator=(const Set<T> &other);
   ~Set();
 
-  void insert(T key);
-  void erase(T key);
+  void insert(const T &key);
+  void erase(const T &key);
+  iterator begin() const { return iterator(tree->first); }
+  iterator end() const { return iterator(tree->nextToLast); }
+
+  iterator find(const T &key) const {
+    return iterator(tree->find(tree->root, key));
+  };
+
+  iterator lower_bound(const T &key) const {
+    return iterator(tree->lower_bound(tree->root, tree->nextToLast, key));
+  };
 
   size_t size() const;
   bool empty() const;
-  void getData(std::vector<T> &buf);
 };
 
 template <typename T>
 template <class InputIt>
-Set<T>::Set(InputIt first, InputIt last) {
+Set<T>::Set(InputIt first, InputIt last) : len(0), tree(new AVLTree<T>) {
   for (; first != last; ++first) {
     bool flag = false;
     tree->insert(*first, flag);
@@ -38,29 +96,31 @@ Set<T>::Set(InputIt first, InputIt last) {
   }
 }
 
-template <typename T> void Set<T>::getData(std::vector<T> &buf) {
-  tree->getData(tree->root, buf);
-}
-
 template <typename T> Set<T>::~Set<T>() { delete tree; }
 
 template <typename T> Set<T> &Set<T>::operator=(const Set<T> &other) {
   if (this != &other) {
     delete tree;
-    len = other.len;
-    tree = new AVLTree<T>(*other.tree);
+    len = 0;
+    tree = new AVLTree<T>;
+    for (Set<T>::iterator i = other.begin(); i != other.end(); i++) {
+      insert(*i);
+    }
   }
   return *this;
 }
 
-template <typename T> Set<T>::Set(const Set<T> &other) : len(other.len) {
-  tree = new AVLTree<T>(*other.tree);
+template <typename T>
+Set<T>::Set(const Set<T> &other) : len(0), tree(new AVLTree<T>) {
+  for (Set<T>::iterator i = other.begin(); i != other.end(); ++i) {
+    insert(*i);
+  }
 }
 
-template <typename T> Set<T>::Set() : tree(new AVLTree<T>), len(0) {}
+template <typename T> Set<T>::Set() : len(0), tree(new AVLTree<T>) {}
 
 template <typename T>
-Set<T>::Set(std::initializer_list<T> list) : tree(new AVLTree<T>), len(0) {
+Set<T>::Set(std::initializer_list<T> list) : len(0), tree(new AVLTree<T>) {
   auto *item = list.begin();
   for (; item != list.end(); ++item) {
     bool flag = false;
@@ -72,9 +132,10 @@ Set<T>::Set(std::initializer_list<T> list) : tree(new AVLTree<T>), len(0) {
 }
 
 template <typename T> size_t Set<T>::size() const { return len; }
+
 template <typename T> bool Set<T>::empty() const { return len == 0; }
 
-template <typename T> void Set<T>::insert(T key) {
+template <typename T> void Set<T>::insert(const T &key) {
   bool flag = false;
   tree->insert(key, flag);
   if (flag) {
@@ -82,7 +143,7 @@ template <typename T> void Set<T>::insert(T key) {
   }
 }
 
-template <typename T> void Set<T>::erase(T key) {
+template <typename T> void Set<T>::erase(const T &key) {
   bool flag = false;
   tree->erase(key, flag);
   if (flag) {

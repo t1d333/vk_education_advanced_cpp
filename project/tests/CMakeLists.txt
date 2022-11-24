@@ -4,9 +4,12 @@ FIND_PACKAGE(Threads REQUIRED)
 ADD_EXECUTABLE(
         tests
         src/main.cpp
-        src/constructorstest.cpp
-        src/sizetest.cpp
-        src/inserttest.cpp
+        src/constnesstest.cpp
+        src/copy_correctness_test.cpp
+        src/emptytest.cpp
+        src/iterators_test.cpp
+        src/destructor_test.cpp
+        src/erasetest.cpp
 )
 TARGET_LINK_LIBRARIES(tests ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} set -lstdc++fs)
 
