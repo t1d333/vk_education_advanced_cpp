@@ -29,6 +29,14 @@ template <typename T> class AVLTree {
   friend class Set<T>;
 
 private:
+  Node<T> *root;
+
+  Node<T> *first;
+
+  Node<T> *last;
+
+  Node<T> *nextToLast;
+
   Node<T> *rightRotate(Node<T> *y);
 
   Node<T> *leftRotate(Node<T> *x);
@@ -47,18 +55,13 @@ private:
 
   void switchNodes(Node<T> *first, Node<T> *second);
 
-  void CopyTree(Node<T> *p);
+  void copyTree(Node<T> *p);
 
   int height(Node<T> *N);
 
   int getBalanceFactor(Node<T> *N);
 
 public:
-  Node<T> *root;
-  Node<T> *first;
-  Node<T> *last;
-  Node<T> *nextToLast;
-
   AVLTree() : root(nullptr), nextToLast(new Node<T>) {
     first = nextToLast;
     last = nextToLast;
@@ -67,8 +70,11 @@ public:
   ~AVLTree();
 
   Node<T> *find(Node<T> *node, const T &key);
+
   Node<T> *lower_bound(Node<T> *root, Node<T> *node, const T &key);
+
   void insert(const T &k, bool &flag);
+
   void erase(const T &k, bool &flag);
 };
 
@@ -90,6 +96,7 @@ template <typename T> Node<T> *AVLTree<T>::find(Node<T> *node, const T &key) {
   if (!node) {
     return nextToLast;
   }
+
   if (node->key < key) {
     return find(node->right, key);
   } else if (key < node->key) {
@@ -104,6 +111,7 @@ Node<T> *AVLTree<T>::lower_bound(Node<T> *root, Node<T> *node, const T &key) {
   if (!root) {
     return node;
   }
+
   if (root->key < key) {
     return lower_bound(root->right, node, key);
   } else if (key < root->key) {
@@ -132,6 +140,7 @@ void AVLTree<T>::insertInList(Node<T> *prevNode, Node<T> *node) {
   prevNode->next = node;
   node->next = tmp;
   node->prev = prevNode;
+
   if (tmp) {
     tmp->prev = node;
   }
@@ -156,12 +165,12 @@ template <typename T> void AVLTree<T>::deleteFromList(Node<T> *node) {
   next->prev = prev;
 }
 
-template <typename T> void AVLTree<T>::CopyTree(Node<T> *p) {
+template <typename T> void AVLTree<T>::copyTree(Node<T> *p) {
   if (p) {
     bool tmp = true;
     root = insertNode(root, p->key, nullptr, tmp);
-    CopyTree(p->left);
-    CopyTree(p->right);
+    copyTree(p->left);
+    copyTree(p->right);
   }
 }
 
@@ -211,17 +220,20 @@ Node<T> *AVLTree<T>::insertNode(Node<T> *node, T key, Node<T> *next,
     }
     return tmp;
   }
+
   if (key < node->key)
     node->left = insertNode(node->left, key, next, flag);
   else if (node->key < key)
     node->right = insertNode(node->right, key, node, flag);
   else
     return node;
+
   return balance(node);
 }
 
 template <typename T> Node<T> *AVLTree<T>::nodeWithMimumValue(Node<T> *node) {
   Node<T> *current = node;
+
   while (current->left != nullptr)
     current = current->left;
   return current;
@@ -283,6 +295,7 @@ void AVLTree<T>::switchNodes(Node<T> *first, Node<T> *second) {
 template <typename T> Node<T> *AVLTree<T>::balance(Node<T> *root) {
   root->height = 1 + std::max(height(root->left), height(root->right));
   int balanceFactor = getBalanceFactor(root);
+
   if (balanceFactor > 1) {
     if (getBalanceFactor(root->left) >= 0) {
       return rightRotate(root);
@@ -291,6 +304,7 @@ template <typename T> Node<T> *AVLTree<T>::balance(Node<T> *root) {
       return rightRotate(root);
     }
   }
+
   if (balanceFactor < -1) {
     if (getBalanceFactor(root->right) <= 0) {
       return leftRotate(root);
@@ -306,6 +320,7 @@ template <typename T>
 Node<T> *AVLTree<T>::deleteNode(Node<T> *root, T key, bool &flag) {
   if (!root)
     return root;
+
   if (key < root->key)
     root->left = deleteNode(root->left, key, flag);
   else if (root->key < key)

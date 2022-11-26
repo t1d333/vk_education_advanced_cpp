@@ -20,12 +20,14 @@ public:
     iterator() : ptr(nullptr){};
     iterator(const iterator &it) : ptr(it.ptr) {}
     explicit iterator(Node<T> *node) : ptr(node) {}
+
     iterator &operator=(const iterator &it) {
       if (this != &it) {
         ptr = it.ptr;
       }
       return *this;
     }
+
     bool operator==(const iterator &it) const { return ptr == it.ptr; }
     bool operator!=(const iterator &it) const { return ptr != it.ptr; }
     bool operator<(const iterator &it) const { return **this < *it; }
@@ -33,8 +35,8 @@ public:
     bool operator<=(const iterator &it) const { return **this <= *it; }
 
     bool operator>=(const iterator &it) const { return **this >= *it; }
-    const T &operator*() const { return ptr->key; }
-    const T *operator->() const { return &(ptr->key); };
+    T &operator*() const { return ptr->key; }
+    T *operator->() const { return &(ptr->key); };
     iterator operator++() {
       if (ptr->next == nullptr) {
         return *this;
@@ -62,6 +64,57 @@ public:
     Node<T> *ptr;
   };
 
+  class const_iterator {
+  public:
+    const_iterator() : ptr(nullptr){};
+    const_iterator(const const_iterator &it) : ptr(it.ptr) {}
+    explicit const_iterator(Node<T> *node) : ptr(node) {}
+
+    const_iterator &operator=(const iterator &it) {
+      if (this != &it) {
+        ptr = it.ptr;
+      }
+      return *this;
+    }
+
+    bool operator==(const const_iterator &it) const { return ptr == it.ptr; }
+    bool operator!=(const const_iterator &it) const { return ptr != it.ptr; }
+    bool operator<(const const_iterator &it) const { return **this < *it; }
+    bool operator>(const const_iterator &it) const { return **this > *it; }
+    bool operator<=(const const_iterator &it) const { return **this <= *it; }
+    bool operator>=(const const_iterator &it) const { return **this >= *it; }
+    const T &operator*() const { return ptr->key; }
+    T const *operator->() const { return &(ptr->key); };
+
+    const_iterator operator++() {
+      if (ptr->next == nullptr) {
+        return *this;
+      }
+      ptr = ptr->next;
+      return *this;
+    }
+
+    const_iterator operator--() {
+      ptr = ptr->prev;
+      return *this;
+    }
+
+    const_iterator operator++(int) {
+      const_iterator old(*this);
+      ++(*this);
+      return old;
+    }
+
+    const_iterator operator--(int) {
+      const_iterator old(*this);
+      --(*this);
+      return old;
+    }
+
+  private:
+    Node<T> *ptr;
+  };
+
   Set();
   Set(std::initializer_list<T>);
   Set(const Set<T> &other);
@@ -71,8 +124,12 @@ public:
 
   void insert(const T &key);
   void erase(const T &key);
+
   iterator begin() const { return iterator(tree->first); }
   iterator end() const { return iterator(tree->nextToLast); }
+
+  iterator cbegin() const { return const_iterator(tree->first); }
+  iterator cend() const { return const_iterator(tree->nextToLast); }
 
   iterator find(const T &key) const {
     return iterator(tree->find(tree->root, key));
@@ -107,6 +164,7 @@ template <typename T> Set<T> &Set<T>::operator=(const Set<T> &other) {
       insert(*i);
     }
   }
+
   return *this;
 }
 
@@ -122,6 +180,7 @@ template <typename T> Set<T>::Set() : len(0), tree(new AVLTree<T>) {}
 template <typename T>
 Set<T>::Set(std::initializer_list<T> list) : len(0), tree(new AVLTree<T>) {
   auto *item = list.begin();
+
   for (; item != list.end(); ++item) {
     bool flag = false;
     tree->insert(*item, flag);
@@ -138,6 +197,7 @@ template <typename T> bool Set<T>::empty() const { return len == 0; }
 template <typename T> void Set<T>::insert(const T &key) {
   bool flag = false;
   tree->insert(key, flag);
+
   if (flag) {
     ++len;
   }
@@ -146,6 +206,7 @@ template <typename T> void Set<T>::insert(const T &key) {
 template <typename T> void Set<T>::erase(const T &key) {
   bool flag = false;
   tree->erase(key, flag);
+
   if (flag) {
     --len;
   }
