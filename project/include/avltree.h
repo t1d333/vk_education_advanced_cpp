@@ -299,19 +299,20 @@ template <typename T> Node<T> *AVLTree<T>::balance(Node<T> *root) {
   if (balanceFactor > 1) {
     if (getBalanceFactor(root->left) >= 0) {
       return rightRotate(root);
-    } else {
-      root->left = leftRotate(root->left);
-      return rightRotate(root);
     }
+
+    root->left = leftRotate(root->left);
+    return rightRotate(root);
   }
 
   if (balanceFactor < -1) {
+
     if (getBalanceFactor(root->right) <= 0) {
       return leftRotate(root);
-    } else {
-      root->right = rightRotate(root->right);
-      return leftRotate(root);
     }
+
+    root->right = rightRotate(root->right);
+    return leftRotate(root);
   }
   return root;
 }

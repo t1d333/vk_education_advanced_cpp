@@ -128,8 +128,8 @@ public:
   iterator begin() const { return iterator(tree->first); }
   iterator end() const { return iterator(tree->nextToLast); }
 
-  iterator cbegin() const { return const_iterator(tree->first); }
-  iterator cend() const { return const_iterator(tree->nextToLast); }
+  const_iterator cbegin() const { return const_iterator(tree->first); }
+  const_iterator cend() const { return const_iterator(tree->nextToLast); }
 
   iterator find(const T &key) const {
     return iterator(tree->find(tree->root, key));
