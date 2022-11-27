@@ -35,8 +35,8 @@ public:
     bool operator<=(const iterator &it) const { return **this <= *it; }
 
     bool operator>=(const iterator &it) const { return **this >= *it; }
-    T &operator*() const { return ptr->key; }
-    T *operator->() const { return &(ptr->key); };
+    const T &operator*() const { return ptr->key; }
+    T const *operator->() const { return &(ptr->key); };
     iterator operator++() {
       if (ptr->next == nullptr) {
         return *this;
