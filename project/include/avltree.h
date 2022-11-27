@@ -306,7 +306,6 @@ template <typename T> Node<T> *AVLTree<T>::balance(Node<T> *root) {
   }
 
   if (balanceFactor < -1) {
-
     if (getBalanceFactor(root->right) <= 0) {
       return leftRotate(root);
     }
